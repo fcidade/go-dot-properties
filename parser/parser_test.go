@@ -50,11 +50,6 @@ func TestTokenization(t *testing.T) {
 	// 		fmt.Println(tokens)
 	// 	})
 
-	t.Run("Cursor starts at the beginning of the file", func(t *testing.T) {
-		sut := makeSut("")
-		assert.Equal(t, 0, sut.cursor)
-	})
-
 	t.Run("Ignore commentaries (lines that begin w/ # or !)", func(t *testing.T) {
 		testString := `
 	# You are reading the ".properties" entry.
