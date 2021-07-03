@@ -11,82 +11,87 @@ type Token struct {
 	Type string
 }
 
-func Tokenize(text string) (tokens []Token) {
-	cursor := 0
-	for cursor < len(text) {
-		currChar := text[cursor]
+type tokenizer struct {
+	text   string
+	cursor int
+}
 
-		if currChar == '#' || currChar == '!' {
-			cursor++
-			currChar = text[cursor]
-			for currChar != '\n' {
-				cursor++
-				currChar = text[cursor]
+func (t *tokenizer) Tokenize() (tokens []Token) {
+	t.cursor = 0
+	for t.cursor < len(t.text) {
+
+		if t.currChar() == '#' || t.currChar() == '!' {
+			t.nextChar()
+
+			for t.currChar() != '\n' {
+				t.nextChar()
 			}
 		}
 
-		if isAlpha(currChar) {
-			begin := cursor
-			cursor++
-			currChar = text[cursor]
-			for isAlpha(currChar) {
-				cursor++
-				currChar = text[cursor]
+		if t.isAlpha(t.currChar()) {
+			begin := t.cursor
+			t.nextChar()
+			for t.isAlpha(t.currChar()) {
+				t.nextChar()
 			}
 			tokens = append(tokens, Token{
-				Text: text[begin:cursor],
+				Text: t.text[begin:t.cursor],
 				Type: TypeIdentifier,
 			})
 		}
 
-		// for currChar == ' ' {
-		// 	cursor++
-		// 	currChar = text[cursor]
-		// }
+		// 	// for t.currChar() == ' ' {
+		// 	// 	t.nextChar()
+		// 	// }
 
-		if currChar == '=' || currChar == ':' {
+		if t.currChar() == '=' || t.currChar() == ':' {
 			tokens = append(tokens, Token{
-				Text: string(currChar),
+				Text: string(t.currChar()),
 				Type: TypeSeparator,
 			})
-			cursor++
+			t.nextChar()
 
-			// 	for currChar == ' ' {
-			// 		cursor++
-			// 		currChar = text[cursor]
+			// 	for t.currChar() == ' ' {
+			// 		t.nextChar()
 			// 	}
 
-			begin := cursor
+			begin := t.cursor
 			joinedText := ""
 
-			for currChar != '\n' && currChar != '\\' {
+			for t.currChar() != '\n' && t.currChar() != '\\' {
 
-				if currChar == '\\' || currChar == '\r' {
-					joinedText += text[begin:cursor]
-					begin = cursor
-					cursor++
+				if t.currChar() == '\\' || t.currChar() == '\r' {
+					joinedText += t.text[begin:t.cursor]
+					begin = t.cursor
+					t.nextChar()
 				}
 
-				cursor++
-				currChar = text[cursor]
+				t.nextChar()
 			}
 
 			tokens = append(tokens, Token{
-				Text: joinedText + text[begin:cursor],
+				Text: joinedText + t.text[begin:t.cursor],
 				Type: TypeValue,
 			})
 		}
 
-		// for currChar == ' ' {
-		// 	cursor++
-		// 	currChar = text[cursor]
-		// }
+		// 	// for t.currChar() == ' ' {
+		// 	// 	t.nextChar()
+		// 	// }
 
-		cursor++
+		t.nextChar()
 	}
 	return
 }
 
-func isAlpha(currChar byte) bool {
+func (t *tokenizer) currChar() byte {
+	return t.text[t.cursor]
+}
+
+func (t *tokenizer) nextChar() {
+	t.cursor++
+}
+
+func (t *tokenizer) isAlpha(currChar byte) bool {
 	return (currChar >= 'a' && currChar <= 'z') || currChar >= 'A' && currChar <= 'Z'
 }
