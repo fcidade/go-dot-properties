@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -65,21 +66,57 @@ func TestTokenization(t *testing.T) {
 	t.Run("Tokenize identifier, separator and value w/ single line properties", func(t *testing.T) {
 		testString := `
 	website = https://en.wikipedia.org/
-	language = English
+	language : English
 	`
 		tokens := makeSut(testString).Tokenize()
 		assert.Equal(t, 6, len(tokens), "6 token should be created, but %d were made: %v", len(tokens), tokens)
+
+		want := []Token{{
+			Text: "website",
+			Type: TypeIdentifier,
+		}, {
+			Text: "=",
+			Type: TypeSeparator,
+		}, {
+			Text: "https://en.wikipedia.org/",
+			Type: TypeValue,
+		}, {
+			Text: "language",
+			Type: TypeIdentifier,
+		}, {
+			Text: ":",
+			Type: TypeSeparator,
+		}, {
+			Text: "English",
+			Type: TypeValue,
+		}}
+		assert.Equal(t, want, tokens)
 	})
 
-	// 	t.Run("Tokenize identifier, separator and value w/ multi line properties", func(t *testing.T) {
-	// 		testString := `
-	// # The backslash below tells the application to continue reading
-	// # the value onto the next line.
-	// message = Welcome to \
-	// 			Wikipedia!
-	// `
-	// 		tokens := makeSut(testString).Tokenize()
-	// 		fmt.Println(tokens)
-	// 		assert.Equal(t, 3, len(tokens), "3 token should be created, but %d were made: %v", len(tokens), tokens)
-	// 	})
+	t.Run("Tokenize identifier, separator and value w/ multi line properties", func(t *testing.T) {
+		testString := `
+	# The backslash below tells the application to continue reading
+	# the value onto the next line.
+	message = Welcome to \
+				Wikipedia!
+	`
+		tokens := makeSut(testString).Tokenize()
+		fmt.Println(tokens)
+		assert.Equal(t, 3, len(tokens), "3 token should be created, but %d were made: %v", len(tokens), tokens)
+
+		want := []Token{{
+			Text: "message",
+			Type: TypeIdentifier,
+		}, {
+			Text: "=",
+			Type: TypeSeparator,
+		}, {
+			Text: "Welcome to Wikipedia!",
+			Type: TypeValue,
+		}}
+		assert.Equal(t, want, tokens)
+	})
+
+	// TODO: No \r should be found
+	// TODO: Accept symbols like: !
 }

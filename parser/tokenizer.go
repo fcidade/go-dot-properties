@@ -19,24 +19,21 @@ type tokenizer struct {
 
 func (t *tokenizer) Tokenize() []Token {
 	for t.cursor < len(t.text) {
-
+		t.ignoreWhitespaces()
 		t.ignoreComments()
 		t.recognizeIdentifier()
-
-		// 	// for t.currChar() == ' ' {
-		// 	// 	t.nextChar()
-		// 	// }
-
 		t.recognizeValue()
-
-		// 	// for t.currChar() == ' ' {
-		// 	// 	t.nextChar()
-		// 	// }
 
 		t.nextChar()
 	}
 
 	return t.tokens
+}
+
+func (t *tokenizer) ignoreWhitespaces() {
+	for t.currChar() == ' ' || t.currChar() == '\n' || t.currChar() == '\r' {
+		t.nextChar()
+	}
 }
 
 func (t *tokenizer) ignoreComments() {
@@ -63,30 +60,46 @@ func (t *tokenizer) recognizeIdentifier() {
 }
 
 func (t *tokenizer) recognizeValue() {
+
 	if t.currChar() == '=' || t.currChar() == ':' {
 		separator := string(t.currChar())
 		t.createToken(separator, TypeSeparator)
 		t.nextChar()
 
-		// 	for t.currChar() == ' ' {
-		// 		t.nextChar()
-		// 	}
+		t.ignoreWhitespaces()
 
 		begin := t.cursor
-		joinedText := ""
+		value := ""
 
-		for t.currChar() != '\n' && t.currChar() != '\\' {
+		// for t.currChar() != '\n' && t.currChar() != '\\' {
+		for {
 
-			if t.currChar() == '\\' || t.currChar() == '\r' {
-				joinedText += t.text[begin:t.cursor]
-				begin = t.cursor
+			// if t.currChar() == '\r'{
+			// 	value += t.text[begin:t.cursor]
+			// 	t.nextChar()
+			// 	begin = t.cursor
+			// }
+
+			if t.currChar() == '\n' {
+				break
+			}
+
+			if t.currChar() == '\\' {
+				value += t.text[begin:t.cursor]
 				t.nextChar()
+				begin = t.cursor
+
+				for t.currChar() == '\n' || t.currChar() == '\t' {
+					t.nextChar()
+					begin = t.cursor
+				}
 			}
 
 			t.nextChar()
+			// break
 		}
 
-		value := joinedText + t.text[begin:t.cursor]
+		value = value + t.text[begin:t.cursor]
 		t.createToken(value, TypeValue)
 	}
 }
