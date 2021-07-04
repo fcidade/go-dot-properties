@@ -117,6 +117,95 @@ func TestTokenization(t *testing.T) {
 		assert.Equal(t, want, tokens)
 	})
 
+	t.Run("If the line ends with an even ammount of backslashes, the next line should not be included in the value", func(t *testing.T) {
+		testString := `
+	# But if the number of backslashes at the end of the line is even, the next line is not included in the value. In the following example, the value for "key" is "valueOverOneLine\"
+	key = valueOverOneLine\\
+	# This line is not included in the value for "key"
+	`
+		tokens := makeSut(testString).Tokenize()
+		fmt.Println(tokens)
+		assert.Equal(t, 3, len(tokens), "3 token should be created, but %d were made: %v", len(tokens), tokens)
+
+		want := []Token{{
+			Text: "key",
+			Type: TypeIdentifier,
+		}, {
+			Text: "=",
+			Type: TypeSeparator,
+		}, {
+			Text: "valueOverOneLine\\",
+			Type: TypeValue,
+		}}
+		assert.Equal(t, want, tokens)
+	})
+
+	t.Run("Identifiers should be able to have escaped spaces", func(t *testing.T) {
+		testString := `
+	# Add spaces to the key
+	key\ with\ spaces = This is the value that could be looked up with the key "key with spaces".
+	`
+		tokens := makeSut(testString).Tokenize()
+		fmt.Println(tokens)
+		assert.Equal(t, 3, len(tokens), "3 token should be created, but %d were made: %v", len(tokens), tokens)
+
+		want := []Token{{
+			Text: "key with spaces",
+			Type: TypeIdentifier,
+		}, {
+			Text: "=",
+			Type: TypeSeparator,
+		}, {
+			Text: "This is the value that could be looked up with the key \"key with spaces\".",
+			Type: TypeValue,
+		}}
+		assert.Equal(t, want, tokens)
+	})
+
+	t.Run("Colon (:) and equal (=) signs should also be escaped", func(t *testing.T) {
+		testString := `
+		# The characters = and : in the key must be escaped as well:
+		key\:with\=colonAndEqualsSign = This is the value for the key "key:with=colonAndEqualsSign"
+	`
+		tokens := makeSut(testString).Tokenize()
+		fmt.Println(tokens)
+		assert.Equal(t, 3, len(tokens), "3 token should be created, but %d were made: %v", len(tokens), tokens)
+
+		want := []Token{{
+			Text: "key:with=colonAndEqualsSign",
+			Type: TypeIdentifier,
+		}, {
+			Text: "=",
+			Type: TypeSeparator,
+		}, {
+			Text: "This is the value for the key \"key:with=colonAndEqualsSign\"",
+			Type: TypeValue,
+		}}
+		assert.Equal(t, want, tokens)
+	})
+
+	t.Run("Should also accept unicode characters", func(t *testing.T) {
+		testString := `
+		# Unicode
+		tab : \u0009
+	`
+		tokens := makeSut(testString).Tokenize()
+		fmt.Println(tokens)
+		assert.Equal(t, 3, len(tokens), "3 token should be created, but %d were made: %v", len(tokens), tokens)
+
+		want := []Token{{
+			Text: "tab",
+			Type: TypeIdentifier,
+		}, {
+			Text: ":",
+			Type: TypeSeparator,
+		}, {
+			Text: "\u0009",
+			Type: TypeValue,
+		}}
+		assert.Equal(t, want, tokens)
+	})
+
 	// TODO: No \r should be found
 	// TODO: Accept symbols like: !
 }

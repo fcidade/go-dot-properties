@@ -50,11 +50,23 @@ func (t *tokenizer) recognizeIdentifier() {
 	if t.isAlpha(t.currChar()) {
 		begin := t.cursor
 		t.nextChar()
-		for t.isAlpha(t.currChar()) {
-			t.nextChar()
+
+		identifier := ""
+
+		for {
+			if t.isAlpha(t.currChar()) {
+				t.nextChar()
+			} else if t.currChar() == '\\' {
+				identifier += t.text[begin:t.cursor]
+				t.nextChar()
+				begin = t.cursor
+				t.nextChar()
+			} else {
+				break
+			}
 		}
 
-		identifier := t.text[begin:t.cursor]
+		identifier += t.text[begin:t.cursor]
 		t.createToken(identifier, TypeIdentifier)
 	}
 }
@@ -96,10 +108,9 @@ func (t *tokenizer) recognizeValue() {
 			}
 
 			t.nextChar()
-			// break
 		}
 
-		value = value + t.text[begin:t.cursor]
+		value += t.text[begin:t.cursor]
 		t.createToken(value, TypeValue)
 	}
 }
