@@ -31,6 +31,7 @@ func (t *tokenizer) Tokenize() []Token {
 }
 
 func (t *tokenizer) ignoreWhitespaces() {
+	// TODO: maybe change to !isAlphaNumeric?
 	for t.currChar() == ' ' || t.currChar() == '\n' || t.currChar() == '\r' {
 		t.nextChar()
 	}
@@ -101,6 +102,14 @@ func (t *tokenizer) recognizeValue() {
 				t.nextChar()
 				begin = t.cursor
 
+				if t.currChar() == 'u' {
+					t.nextChar()
+					for t.isNumeric(t.currChar()) {
+						t.nextChar()
+					}
+					begin = t.cursor
+				}
+
 				for t.currChar() == '\n' || t.currChar() == '\t' {
 					t.nextChar()
 					begin = t.cursor
@@ -120,7 +129,9 @@ func (t *tokenizer) currChar() byte {
 }
 
 func (t *tokenizer) nextChar() {
-	t.cursor++
+	if t.cursor < len(t.text) {
+		t.cursor++
+	}
 }
 
 func (t *tokenizer) createToken(text, tokenType string) {
@@ -132,4 +143,8 @@ func (t *tokenizer) createToken(text, tokenType string) {
 
 func (t *tokenizer) isAlpha(currChar byte) bool {
 	return (currChar >= 'a' && currChar <= 'z') || currChar >= 'A' && currChar <= 'Z'
+}
+
+func (t *tokenizer) isNumeric(currChar byte) bool {
+	return currChar >= '0' && currChar <= '9'
 }
