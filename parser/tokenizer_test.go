@@ -206,7 +206,26 @@ func TestTokenization(t *testing.T) {
 		assert.Equal(t, want, tokens)
 	})
 
-	// TODO: No \r should be found
-	// TODO: Accept symbols like: !
-	// TODO, lines without \n on the last line
+	t.Run("Should accept backslashes", func(t *testing.T) {
+		testString := `
+		# If you want your property to include a backslash, it should be escaped by another backslash
+		path=c:\\wiki\\templates
+		# However, some editors will handle this automatically
+	`
+		tokens := makeSut(testString).Tokenize()
+		fmt.Println(tokens)
+		assert.Equal(t, 3, len(tokens), "3 token should be created, but %d were made: %v", len(tokens), tokens)
+
+		want := []Token{{
+			Text: "path",
+			Type: TypeIdentifier,
+		}, {
+			Text: "=",
+			Type: TypeSeparator,
+		}, {
+			Text: "c:\\wiki\\templates",
+			Type: TypeValue,
+		}}
+		assert.Equal(t, want, tokens)
+	})
 }
