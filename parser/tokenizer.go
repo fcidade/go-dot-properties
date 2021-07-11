@@ -37,7 +37,7 @@ func (t *tokenizer) Tokenize() []Token {
 }
 
 func (t *tokenizer) ignoreWhitespaces() {
-	// TODO: maybe change to !isAlphaNumeric?
+	// Idea: maybe change to !isAlphaNumeric?
 	for t.currChar() == ' ' || t.currChar() == '\n' || t.currChar() == '\r' {
 		t.nextChar()
 	}
@@ -90,19 +90,11 @@ func (t *tokenizer) recognizeValue() {
 		begin := t.cursor
 		value := ""
 
-		// for t.currChar() != '\n' && t.currChar() != '\\' {
 		for {
 
 			if t.currChar() == EOF {
 				break
 			}
-
-			// if t.currChar() == '\r'{
-			// 	value += t.text[begin:t.cursor]
-			// 	t.nextChar()
-			// 	begin = t.cursor
-			// }
-
 			if t.currChar() == '\n' {
 				break
 			}
