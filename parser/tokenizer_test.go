@@ -2,8 +2,6 @@ package parser
 
 import (
 	"fmt"
-	"math"
-	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -211,35 +209,4 @@ func TestTokenization(t *testing.T) {
 	// TODO: No \r should be found
 	// TODO: Accept symbols like: !
 	// TODO, lines without \n on the last line
-}
-
-func Uni(in string) (out string) {
-	o, _ := strconv.Atoi(in[1:])
-	fmt.Println(o)
-	return string(rune(o))
-}
-
-func TestUnicode(t *testing.T) {
-	str := "u0009"
-	want := "\u0009"
-	have := Uni(str)
-	assert.Equal(t, want, have)
-}
-
-func TestHomemadeAtoi(t *testing.T) {
-	str := "123"
-	output := 0
-
-	for i := len(str) - 1; i >= 0; i-- {
-		char := str[len(str)-i]
-		// fmt.Println(i, char, str)
-		output += int(byte(char)-0x30) * Pow(10, i)
-		fmt.Println(i, byte(char)-0x30, Pow(10, i))
-	}
-
-	fmt.Println("Output", output)
-}
-
-func Pow(base, pot int) int {
-	return int(math.Pow(float64(base), float64(pot)))
 }
