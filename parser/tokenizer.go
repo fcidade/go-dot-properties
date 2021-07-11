@@ -1,9 +1,15 @@
 package parser
 
+import "strconv"
+
 const (
 	TypeIdentifier = "identifier"
 	TypeValue      = "value"
 	TypeSeparator  = "separator"
+)
+
+const (
+	EOF = 0x00
 )
 
 type Token struct {
@@ -87,6 +93,10 @@ func (t *tokenizer) recognizeValue() {
 		// for t.currChar() != '\n' && t.currChar() != '\\' {
 		for {
 
+			if t.currChar() == EOF {
+				break
+			}
+
 			// if t.currChar() == '\r'{
 			// 	value += t.text[begin:t.cursor]
 			// 	t.nextChar()
@@ -104,8 +114,13 @@ func (t *tokenizer) recognizeValue() {
 
 				if t.currChar() == 'u' {
 					t.nextChar()
+					unicodeStr := ""
 					for t.isNumeric(t.currChar()) {
+						unicodeStr += string(rune(t.currChar()))
 						t.nextChar()
+					}
+					if len(unicodeStr) != 0 {
+						value = t.handleUnicode(unicodeStr)
 					}
 					begin = t.cursor
 				}
@@ -124,7 +139,18 @@ func (t *tokenizer) recognizeValue() {
 	}
 }
 
+func (t *tokenizer) handleUnicode(in string) (out string) {
+	numeric, err := strconv.Atoi(in)
+	if err != nil {
+		return ""
+	}
+	return string(rune(numeric))
+}
+
 func (t *tokenizer) currChar() byte {
+	if t.cursor >= len(t.text) {
+		return EOF
+	}
 	return t.text[t.cursor]
 }
 
