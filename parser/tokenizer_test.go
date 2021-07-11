@@ -7,11 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func makeSut(text string) *tokenizer {
-	return &tokenizer{
-		text:   text,
-		cursor: 0,
-	}
+func makeTokenizerSut(text string) *tokenizer {
+	return NewTokenizer(text)
 }
 
 func TestTokenization(t *testing.T) {
@@ -23,7 +20,7 @@ func TestTokenization(t *testing.T) {
 	    # a preceding backslash to ensure that they are properly loaded.
 	# However, there is no need to precede the value characters =, and : by a backslash.
 	`
-		tokens := makeSut(testString).Tokenize()
+		tokens := makeTokenizerSut(testString).Tokenize()
 		assert.Equal(t, 0, len(tokens), "No token should be created, but %d were made: %v", len(tokens), tokens)
 	})
 
@@ -32,7 +29,7 @@ func TestTokenization(t *testing.T) {
 	website = https://en.wikipedia.org/
 	language : English
 	`
-		tokens := makeSut(testString).Tokenize()
+		tokens := makeTokenizerSut(testString).Tokenize()
 		assert.Equal(t, 6, len(tokens), "6 token should be created, but %d were made: %v", len(tokens), tokens)
 
 		want := []Token{{
@@ -64,7 +61,7 @@ func TestTokenization(t *testing.T) {
 	message = Welcome to \
 				Wikipedia!
 	`
-		tokens := makeSut(testString).Tokenize()
+		tokens := makeTokenizerSut(testString).Tokenize()
 		fmt.Println(tokens)
 		assert.Equal(t, 3, len(tokens), "3 token should be created, but %d were made: %v", len(tokens), tokens)
 
@@ -87,7 +84,7 @@ func TestTokenization(t *testing.T) {
 	key = valueOverOneLine\\
 	# This line is not included in the value for "key"
 	`
-		tokens := makeSut(testString).Tokenize()
+		tokens := makeTokenizerSut(testString).Tokenize()
 		fmt.Println(tokens)
 		assert.Equal(t, 3, len(tokens), "3 token should be created, but %d were made: %v", len(tokens), tokens)
 
@@ -109,7 +106,7 @@ func TestTokenization(t *testing.T) {
 	# Add spaces to the key
 	key\ with\ spaces = This is the value that could be looked up with the key "key with spaces".
 	`
-		tokens := makeSut(testString).Tokenize()
+		tokens := makeTokenizerSut(testString).Tokenize()
 		fmt.Println(tokens)
 		assert.Equal(t, 3, len(tokens), "3 token should be created, but %d were made: %v", len(tokens), tokens)
 
@@ -131,7 +128,7 @@ func TestTokenization(t *testing.T) {
 		# The characters = and : in the key must be escaped as well:
 		key\:with\=colonAndEqualsSign = This is the value for the key "key:with=colonAndEqualsSign"
 	`
-		tokens := makeSut(testString).Tokenize()
+		tokens := makeTokenizerSut(testString).Tokenize()
 		fmt.Println(tokens)
 		assert.Equal(t, 3, len(tokens), "3 token should be created, but %d were made: %v", len(tokens), tokens)
 
@@ -153,7 +150,7 @@ func TestTokenization(t *testing.T) {
 		# Unicode
 		tab : \u0009
 	`
-		tokens := makeSut(testString).Tokenize()
+		tokens := makeTokenizerSut(testString).Tokenize()
 		fmt.Println(tokens)
 		assert.Equal(t, 3, len(tokens), "3 token should be created, but %d were made: %v", len(tokens), tokens)
 
@@ -176,7 +173,7 @@ func TestTokenization(t *testing.T) {
 		path=c:\\wiki\\templates
 		# However, some editors will handle this automatically
 	`
-		tokens := makeSut(testString).Tokenize()
+		tokens := makeTokenizerSut(testString).Tokenize()
 		fmt.Println(tokens)
 		assert.Equal(t, 3, len(tokens), "3 token should be created, but %d were made: %v", len(tokens), tokens)
 

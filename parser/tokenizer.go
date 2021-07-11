@@ -3,24 +3,21 @@ package parser
 import "strconv"
 
 const (
-	TypeIdentifier = "identifier"
-	TypeValue      = "value"
-	TypeSeparator  = "separator"
-)
-
-const (
 	EOF = 0x00
 )
-
-type Token struct {
-	Text string
-	Type string
-}
 
 type tokenizer struct {
 	text   string
 	cursor int
 	tokens []Token
+}
+
+func NewTokenizer(text string) *tokenizer {
+	return &tokenizer{
+		text:   text,
+		cursor: 0,
+		tokens: []Token{},
+	}
 }
 
 func (t *tokenizer) Tokenize() []Token {
