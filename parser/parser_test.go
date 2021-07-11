@@ -12,6 +12,26 @@ func makeParserSut(tokens []Token) *parser {
 }
 
 func TestParser(t *testing.T) {
+	t.Run("Return syntax error if token is wrongly positioned", func(t *testing.T) {
+		tokens := []Token{{
+			Text: "website",
+			Type: TypeIdentifier,
+		}, {
+			Text: "https://en.wikipedia.org/",
+			Type: TypeValue,
+		}, {
+			Text: "=",
+			Type: TypeSeparator,
+		}}
+
+		parser := makeParserSut(tokens)
+
+		want := InvalidTokenTypeError(TypeSeparator, TypeValue)
+		_, have := parser.ParseToMap()
+
+		assert.Equal(t, want, have)
+	})
+
 	t.Run("Map tokens to a map of strings", func(t *testing.T) {
 		tokens := []Token{{
 			Text: "website",
@@ -40,9 +60,9 @@ func TestParser(t *testing.T) {
 			"language": "English",
 		}
 		have, err := parser.ParseToMap()
-
-		fmt.Println(err)
+		fmt.Println(have)
 
 		assert.Equal(t, want, have)
+		assert.Nil(t, err)
 	})
 }

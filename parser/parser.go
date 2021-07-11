@@ -17,43 +17,40 @@ func NewParser(tokens []Token) *parser {
 func (p *parser) ParseToMap() (out map[string]string, err error) {
 	out = make(map[string]string)
 
-	for p.cursor <= len(p.tokens) {
+	for p.cursor < len(p.tokens) {
 
 		token, err := p.currToken()
-
 		if err != nil {
-			return out, fmt.Errorf("expecting identifier, found nothing")
+			return out, ExpectingTokenError(TypeIdentifier)
 		}
 		if token.Type != TypeIdentifier {
-			return out, fmt.Errorf("expecting identifier, found %s", token.Type) // TODO, custom error w/ p.cursor
+			return out, InvalidTokenTypeError(TypeIdentifier, token.Type)
 		}
 		key := token.Text
 		p.nextToken()
 
 		token, err = p.currToken()
-
 		if err != nil {
-			return out, fmt.Errorf("expecting missing, found nothing")
+			return out, ExpectingTokenError(TypeSeparator)
 		}
 		if token.Type != TypeSeparator {
-			return out, fmt.Errorf("separator missing, found %s", token.Type) // TODO, custom error w/ p.cursor
+			return out, InvalidTokenTypeError(TypeSeparator, token.Type)
 		}
 		p.nextToken()
 
 		token, err = p.currToken()
-
 		if err != nil {
-			return out, fmt.Errorf("expecting value, found nothing")
+			return out, ExpectingTokenError(TypeValue)
 		}
 		if token.Type != TypeValue {
-			return out, fmt.Errorf("expecting value, found %s", token.Type) // TODO, custom error w/ p.cursor
+			return out, InvalidTokenTypeError(TypeValue, token.Type)
 		}
 		out[key] = token.Text
 		p.nextToken()
 
 	}
 
-	return
+	return out, nil
 }
 
 func (p *parser) currToken() (token Token, err error) {
