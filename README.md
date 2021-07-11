@@ -1,13 +1,12 @@
 # Golang .properties parser
----
-## About
+## Why this exists
 I made this project to learn basic lexing and parsing algorithms. Not (yet) recommended for production.
 
 ## Goals:
 - [X] Parse .properties to map[string]string
-- [X] Parse .properties to struct
+- [X] Parse struct to .properties
 - [X] Parse map[string]string to .properties
-- [ ] Parse struct to .properties
+- [ ] Parse .properties to struct
 - [ ] Handle types other than strings
 
 ## Usage
