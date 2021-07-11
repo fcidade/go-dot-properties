@@ -65,4 +65,38 @@ func TestParser(t *testing.T) {
 		assert.Equal(t, want, have)
 		assert.Nil(t, err)
 	})
+
+	t.Run("Assign tokens to a struct", func(t *testing.T) {
+		tokens := []Token{{
+			Text: "website",
+			Type: TypeIdentifier,
+		}, {
+			Text: "=",
+			Type: TypeSeparator,
+		}, {
+			Text: "https://en.wikipedia.org/",
+			Type: TypeValue,
+		}, {
+			Text: "language",
+			Type: TypeIdentifier,
+		}, {
+			Text: ":",
+			Type: TypeSeparator,
+		}, {
+			Text: "English",
+			Type: TypeValue,
+		}}
+
+		parser := makeParserSut(tokens)
+
+		want := map[string]string{
+			"website":  "https://en.wikipedia.org/",
+			"language": "English",
+		}
+		have, err := parser.ParseToMap()
+		fmt.Println(have)
+
+		assert.Equal(t, want, have)
+		assert.Nil(t, err)
+	})
 }

@@ -13,7 +13,7 @@ func structToMap(in interface{}) (out map[string]string) {
 		field := fields.Field(i)
 		value := values.Field(i)
 
-		tagName := field.Tag.Get("properties")
+		tagName := field.Tag.Get("property")
 		if len(tagName) == 0 {
 			tagName = field.Name
 		}
