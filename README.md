@@ -8,6 +8,7 @@ I made this project to learn basic lexing and parsing algorithms. Not (yet) reco
 - [X] Parse map[string]string to .properties
 - [ ] Parse .properties to struct
 - [ ] Handle types other than strings
+- [ ] Better error messaging, with line and column
 
 ## Usage
 
